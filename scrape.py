@@ -20,8 +20,20 @@ total_pages = [int(s) for s in total_pages.split() if s.isdigit()]
 limit = total_pages[-1]
 current_page = 1
 
+# Getting name of the restaurant
+name = soup.find('h1').getText().lstrip()
+
+# Getting address
+address = soup.find('address').getText().lstrip()
+
+# Getting price range
+price_range = soup.find('dd', attrs={'class' : 'nowrap price-description'}).getText().lstrip()
+
+# Getting health score
+health_score = soup.find('dd', attrs={'class' : 'nowrap health-score-description'}).getText().lstrip()
+
 # Initializing dataframe
-dataset = pd.DataFrame(columns=('review', 'date', 'rating'))
+dataset = pd.DataFrame(columns=('restaurant_name', 'address', 'price_range', 'health_score', 'review', 'date', 'rating'))
 k = 0
 
 while(current_page <= limit):
@@ -43,7 +55,7 @@ while(current_page <= limit):
         rating = review_rating.select('div[class*="i-stars i-stars--regular"]')
         rating = float(re.findall("\d+\.\d+", rating[0]['title'])[0])
         date = re.findall("\d+\/\d+\/\d+", review_rating.find('span', attrs={'class' : 'rating-qualifier'}).getText())[0]
-        dataset.loc[k] = [review, date, rating]
+        dataset.loc[k] = [name, address, price_range, health_score, review, date, rating]
         k+=1
         
 dataset.to_csv('dataset.csv')
